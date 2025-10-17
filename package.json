@@ -1,0 +1,15 @@
+{
+  "name": "teru-ai-proxy",
+  "version": "1.0.0",
+  "description": "CORS-safe proxy for TERU AI Blog Generator (GPT-4 + gpt-image-1-mini)",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "node-fetch": "^3.3.2"
+  }
+}
