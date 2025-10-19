@@ -4,46 +4,29 @@ import cors from "cors";
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json());
 
-// Proxy for OpenAI API
-app.post("/v1/chat/completions", async (req, res) => {
+// OpenAI API のキーを Render の環境変数に設定しておく（例: OPENAI_API_KEY）
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+// /chat/completions への転送ルート
+app.post("/chat/completions", async (req, res) => {
   try {
-    const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-        "Content-Type": "application/json"
+        "Authorization": `Bearer ${OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(req.body)
+      body: JSON.stringify(req.body),
     });
-    const data = await resp.text();
-    res.status(resp.status).send(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
-// Proxy for OpenAI Image API
-app.post("/v1/images/generations", async (req, res) => {
-  try {
-    const resp = await fetch("https://api.openai.com/v1/images/generations", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(req.body)
-    });
-    const data = await resp.text();
-    res.status(resp.status).send(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error("Proxy error:", error);
+    res.status(500).json({ error: "Proxy error" });
   }
-});
-
-app.get("/", (req, res) => {
-  res.send("✅ TERU AI Proxy Server is running.");
 });
 
 const PORT = process.env.PORT || 10000;
